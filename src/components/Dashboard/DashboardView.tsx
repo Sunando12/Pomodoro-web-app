@@ -20,13 +20,13 @@ import {
   Tooltip, 
   CartesianGrid 
 } from 'recharts';
-import type { SessionRecord, TimerSettings } from '../../types';
+import type { SessionRecord, TimerSettings, ThemeMode } from '../../types';
 
 interface DashboardViewProps {
   sessions: SessionRecord[];
   settings: TimerSettings;
   streak: number;
-  theme: 'dark' | 'light';
+  theme: ThemeMode;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -35,7 +35,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   streak,
   theme,
 }) => {
-  const isDark = theme === 'dark';
+  const isDark = theme === 'dark' || theme === 'jungle';
+  const isJungle = theme === 'jungle';
   const [chartView, setChartView] = useState<'hours' | 'sessions'>('hours');
 
   // Filter today's sessions
@@ -283,18 +284,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <AreaChart data={last7DaysData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor={isJungle ? '#10b981' : '#8b5cf6'} stopOpacity={0.4} />
+                    <stop offset="95%" stopColor={isJungle ? '#f59e0b' : '#06b6d4'} stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.4} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? (isJungle ? '#064e3b' : '#334155') : '#e2e8f0'} opacity={0.4} />
                 <XAxis dataKey="day" stroke={isDark ? '#94a3b8' : '#64748b'} fontSize={12} tickLine={false} />
                 <YAxis stroke={isDark ? '#94a3b8' : '#64748b'} fontSize={12} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Area
                   type="monotone"
                   dataKey="hours"
-                  stroke="#a855f7"
+                  stroke={isJungle ? '#10b981' : '#a855f7'}
                   strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#areaGradient)"
@@ -302,11 +303,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </AreaChart>
             ) : (
               <BarChart data={last7DaysData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.4} />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? (isJungle ? '#064e3b' : '#334155') : '#e2e8f0'} opacity={0.4} />
                 <XAxis dataKey="day" stroke={isDark ? '#94a3b8' : '#64748b'} fontSize={12} tickLine={false} />
                 <YAxis stroke={isDark ? '#94a3b8' : '#64748b'} fontSize={12} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="sessions" fill="#06b6d4" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="sessions" fill={isJungle ? '#10b981' : '#06b6d4'} radius={[6, 6, 0, 0]} />
               </BarChart>
             )}
           </ResponsiveContainer>

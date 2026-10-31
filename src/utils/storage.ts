@@ -1,4 +1,4 @@
-import type { TimerSettings, Task, SessionRecord } from '../types';
+import type { TimerSettings, Task, SessionRecord, ThemeMode } from '../types';
 
 export const DEFAULT_SETTINGS: TimerSettings = {
   focusDuration: 25,
@@ -26,8 +26,8 @@ const STORAGE_KEYS = {
 // Seed initial tasks for rich developer experience
 const INITIAL_TASKS: Task[] = [
   {
-    id: 'task-gsoc-proposal',
-    title: 'Draft GSoC Open Source Proposal & Architecture',
+    id: 'task-core-architecture',
+    title: 'Design Core Architecture & State Flow',
     completed: false,
     estimatedPomodoros: 4,
     completedPomodoros: 2,
@@ -75,7 +75,7 @@ function generateSeedSessions(): SessionRecord[] {
         mode: 'focus',
         durationMinutes: 25,
         completedAt: sessionDate.toISOString(),
-        taskTitle: j % 2 === 0 ? 'GSoC Open Source Feature' : 'Performance Optimization',
+        taskTitle: j % 2 === 0 ? 'Core Feature Implementation' : 'Performance Optimization',
       });
     }
   }
@@ -125,9 +125,9 @@ export function saveTasks(tasks: Task[]) {
 
 export function loadActiveTaskId(): string | null {
   try {
-    return localStorage.getItem(STORAGE_KEYS.ACTIVE_TASK_ID) || 'task-gsoc-proposal';
+    return localStorage.getItem(STORAGE_KEYS.ACTIVE_TASK_ID) || 'task-core-architecture';
   } catch {
-    return 'task-gsoc-proposal';
+    return 'task-core-architecture';
   }
 }
 
@@ -182,15 +182,15 @@ export function saveStreak(streak: number) {
   }
 }
 
-export function loadTheme(): 'dark' | 'light' {
+export function loadTheme(): ThemeMode {
   try {
-    const stored = localStorage.getItem(STORAGE_KEYS.THEME);
-    if (stored === 'light' || stored === 'dark') return stored;
+    const stored = localStorage.getItem(STORAGE_KEYS.THEME) as ThemeMode;
+    if (stored === 'light' || stored === 'dark' || stored === 'jungle') return stored;
   } catch {}
   return 'dark'; // Default dark theme
 }
 
-export function saveTheme(theme: 'dark' | 'light') {
+export function saveTheme(theme: ThemeMode) {
   try {
     localStorage.setItem(STORAGE_KEYS.THEME, theme);
   } catch (e) {

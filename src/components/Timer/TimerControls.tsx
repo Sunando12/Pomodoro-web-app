@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, RotateCcw, SkipForward, Plus, Minus, Keyboard } from 'lucide-react';
-import type { TimerMode, TimerStatus } from '../../types';
+import type { TimerMode, TimerStatus, ThemeMode } from '../../types';
 
 interface TimerControlsProps {
   mode: TimerMode;
@@ -12,7 +12,7 @@ interface TimerControlsProps {
   onSkip: () => void;
   onModeChange: (mode: TimerMode) => void;
   onAdjustTime: (deltaMinutes: number) => void;
-  theme: 'dark' | 'light';
+  theme: ThemeMode;
 }
 
 export const TimerControls: React.FC<TimerControlsProps> = ({
@@ -26,7 +26,8 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
   onAdjustTime,
   theme,
 }) => {
-  const isDark = theme === 'dark';
+  const isDark = theme === 'dark' || theme === 'jungle';
+  const isJungle = theme === 'jungle';
   const isRunning = status === 'running';
 
   const modes: { id: TimerMode; label: string }[] = [
@@ -40,7 +41,11 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
       {/* Mode Switcher Tabs */}
       <div
         className={`flex items-center p-1.5 rounded-2xl backdrop-blur-md border shadow-sm ${
-          isDark ? 'bg-slate-900/70 border-white/10' : 'bg-slate-100/90 border-slate-200'
+          isJungle
+            ? 'bg-[#042418]/80 border-emerald-500/25'
+            : isDark
+            ? 'bg-slate-900/70 border-white/10'
+            : 'bg-slate-100/90 border-slate-200'
         }`}
       >
         {modes.map((m) => {
@@ -60,7 +65,11 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
               {isActive && (
                 <motion.div
                   layoutId="activeTimerModeIndicator"
-                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 shadow-md shadow-purple-500/30"
+                  className={`absolute inset-0 rounded-xl shadow-md ${
+                    isJungle
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-500 shadow-emerald-500/35'
+                      : 'bg-gradient-to-r from-purple-600 to-cyan-600 shadow-purple-500/30'
+                  }`}
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                 />
               )}
@@ -79,7 +88,9 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
           onClick={onReset}
           title="Reset timer (R)"
           className={`p-3.5 rounded-2xl border transition-all ${
-            isDark
+            isJungle
+              ? 'bg-[#042418]/70 border-emerald-500/25 text-emerald-300 hover:text-white hover:bg-[#063322] shadow-md'
+              : isDark
               ? 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/80 shadow-md'
               : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm'
           }`}
@@ -96,6 +107,8 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
           className={`w-20 h-20 rounded-3xl flex items-center justify-center text-white shadow-2xl transition-all ${
             isRunning
               ? 'bg-gradient-to-tr from-amber-500 to-orange-500 shadow-amber-500/30'
+              : isJungle
+              ? 'bg-gradient-to-tr from-emerald-600 via-teal-600 to-amber-400 shadow-emerald-500/40 glow-jungle'
               : 'bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-500 shadow-purple-500/40 glow-purple'
           }`}
         >
@@ -113,7 +126,9 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
           onClick={onSkip}
           title="Skip to next session (N)"
           className={`p-3.5 rounded-2xl border transition-all ${
-            isDark
+            isJungle
+              ? 'bg-[#042418]/70 border-emerald-500/25 text-emerald-300 hover:text-white hover:bg-[#063322] shadow-md'
+              : isDark
               ? 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/80 shadow-md'
               : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm'
           }`}
@@ -127,7 +142,9 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
         <button
           onClick={() => onAdjustTime(-5)}
           className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-colors flex items-center gap-1 ${
-            isDark
+            isJungle
+              ? 'bg-[#042418]/50 border-emerald-500/20 text-emerald-300 hover:text-white hover:bg-[#063322]'
+              : isDark
               ? 'bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
               : 'bg-white border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
           }`}
@@ -141,7 +158,9 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
         <button
           onClick={() => onAdjustTime(5)}
           className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-colors flex items-center gap-1 ${
-            isDark
+            isJungle
+              ? 'bg-[#042418]/50 border-emerald-500/20 text-emerald-300 hover:text-white hover:bg-[#063322]'
+              : isDark
               ? 'bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
               : 'bg-white border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50'
           }`}
@@ -154,7 +173,9 @@ export const TimerControls: React.FC<TimerControlsProps> = ({
       {/* Keyboard Shortcuts Hint Bar */}
       <div
         className={`flex items-center gap-3 px-3.5 py-1.5 rounded-xl text-[11px] font-mono border backdrop-blur-sm ${
-          isDark
+          isJungle
+            ? 'bg-[#042418]/40 border-emerald-500/15 text-emerald-300/80'
+            : isDark
             ? 'bg-slate-900/30 border-white/5 text-slate-400'
             : 'bg-slate-100/70 border-slate-200 text-slate-600'
         }`}

@@ -82,6 +82,7 @@ class AmbientAudioManager {
   private noiseNode: AudioNode | null = null;
   private binauralNodes: { left: OscillatorNode; right: OscillatorNode } | null = null;
   private rainInterval: number | null = null;
+  private jungleInterval: number | null = null;
 
   public getCurrentType(): AmbientSoundType {
     return this.currentType;
@@ -114,6 +115,8 @@ class AmbientAudioManager {
       this.startBinauralBeats();
     } else if (type === 'cafe') {
       this.startCafeSound();
+    } else if (type === 'jungle') {
+      this.startJungleSound();
     }
   }
 
@@ -145,6 +148,11 @@ class AmbientAudioManager {
     if (this.rainInterval) {
       window.clearInterval(this.rainInterval);
       this.rainInterval = null;
+    }
+
+    if (this.jungleInterval) {
+      window.clearInterval(this.jungleInterval);
+      this.jungleInterval = null;
     }
 
     if (this.gainNode) {
@@ -262,6 +270,49 @@ class AmbientAudioManager {
     filter.connect(this.gainNode);
     bufferSource.start();
     this.noiseNode = bufferSource;
+  }
+
+  private startJungleSound() {
+    if (!this.ctx || !this.gainNode) return;
+    const bufferSource = this.ctx.createBufferSource();
+    bufferSource.buffer = this.createNoiseBuffer();
+    bufferSource.loop = true;
+
+    // Gentle canopy rain and rustling jungle foliage
+    const bandpass = this.ctx.createBiquadFilter();
+    bandpass.type = 'bandpass';
+    bandpass.frequency.setValueAtTime(1100, this.ctx.currentTime);
+    bandpass.Q.setValueAtTime(0.85, this.ctx.currentTime);
+
+    bufferSource.connect(bandpass);
+    bandpass.connect(this.gainNode);
+    bufferSource.start();
+    this.noiseNode = bufferSource;
+
+    // Tropical bird chirps and distant nature sounds
+    this.jungleInterval = window.setInterval(() => {
+      if (!this.ctx || !this.gainNode) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const now = this.ctx.currentTime;
+      const baseFreq = 2100 + Math.random() * 900;
+
+      // Soft bird chirp sweep
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.35, now + 0.06);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.9, now + 0.14);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.032, now + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+      osc.connect(gain);
+      gain.connect(this.gainNode);
+
+      osc.start(now);
+      osc.stop(now + 0.16);
+    }, 3000);
   }
 }
 

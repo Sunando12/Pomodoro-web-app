@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from './components/Navbar';
-import { GSoCBackground } from './components/GSoCBackground';
+import { AnimatedBackground } from './components/AnimatedBackground';
 import { TimerCircle } from './components/Timer/TimerCircle';
 import { TimerControls } from './components/Timer/TimerControls';
 import { TaskManager } from './components/Tasks/TaskManager';
@@ -9,7 +9,7 @@ import { DashboardView } from './components/Dashboard/DashboardView';
 import { SettingsModal } from './components/Settings/SettingsModal';
 import { CelebrationModal } from './components/CelebrationModal';
 import { usePomodoroTimer } from './hooks/usePomodoroTimer';
-import type { AmbientSoundType, Task, SessionRecord, TimerSettings } from './types';
+import type { AmbientSoundType, Task, SessionRecord, TimerSettings, ThemeMode } from './types';
 import { 
   loadSettings, 
   saveSettings, 
@@ -31,11 +31,12 @@ import {
   Sparkles, 
   CheckCircle2, 
   Clock, 
-  Flame 
+  Flame,
+  Leaf 
 } from 'lucide-react';
 
 export function App() {
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => loadTheme());
+  const [theme, setTheme] = useState<ThemeMode>(() => loadTheme());
   const [activeTab, setActiveTab] = useState<'timer' | 'dashboard' | 'tasks'>('timer');
   const [settings, setSettings] = useState<TimerSettings>(() => loadSettings());
   const [tasks, setTasks] = useState<Task[]>(() => loadTasks());
@@ -44,15 +45,23 @@ export function App() {
   const [streak, setStreak] = useState<number>(() => loadStreak());
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
+  const isDark = theme === 'dark' || theme === 'jungle';
+  const isJungle = theme === 'jungle';
+
   // Sync theme with HTML class and body background
   useEffect(() => {
     saveTheme(theme);
-    if (theme === 'dark') {
+    if (theme === 'jungle') {
+      document.documentElement.classList.add('dark', 'jungle');
+      document.body.style.backgroundColor = '#03140c';
+      document.body.style.color = '#ecfdf5';
+    } else if (theme === 'dark') {
       document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('jungle');
       document.body.style.backgroundColor = '#0b0c16';
       document.body.style.color = '#f8fafc';
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove('dark', 'jungle');
       document.body.style.backgroundColor = '#f8fafc';
       document.body.style.color = '#0f172a';
     }
@@ -214,8 +223,8 @@ export function App() {
 
   return (
     <div className={`relative min-h-screen flex flex-col transition-colors duration-300 font-sans ${theme === 'dark' ? 'dark' : ''}`}>
-      {/* GSoC-Inspired Animated Background */}
-      <GSoCBackground theme={theme} mode={mode} />
+      {/* GSAP-Powered Animated Background */}
+      <AnimatedBackground theme={theme} mode={mode} />
 
       {/* Main Navigation Header */}
       <Navbar
@@ -223,7 +232,7 @@ export function App() {
         setActiveTab={setActiveTab}
         openSettings={() => setIsSettingsOpen(true)}
         theme={theme}
-        toggleTheme={() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
+        setTheme={setTheme}
         streak={streak}
         ambientSoundType={settings.ambientSound}
         ambientVolume={settings.ambientVolume}
@@ -276,7 +285,9 @@ export function App() {
                 <button
                   onClick={() => setActiveTab('dashboard')}
                   className={`p-3 rounded-2xl border backdrop-blur-md text-left transition-all hover:scale-[1.02] ${
-                    theme === 'dark'
+                    isJungle
+                      ? 'bg-[#042418]/70 border-emerald-500/20 hover:border-emerald-500/40'
+                      : isDark
                       ? 'bg-slate-900/60 border-white/5 hover:border-purple-500/30'
                       : 'bg-white/80 border-slate-200 hover:border-purple-300 shadow-sm'
                   }`}
@@ -291,13 +302,15 @@ export function App() {
                 <button
                   onClick={() => setActiveTab('tasks')}
                   className={`p-3 rounded-2xl border backdrop-blur-md text-left transition-all hover:scale-[1.02] ${
-                    theme === 'dark'
+                    isJungle
+                      ? 'bg-[#042418]/70 border-emerald-500/20 hover:border-emerald-500/40'
+                      : isDark
                       ? 'bg-slate-900/60 border-white/5 hover:border-cyan-500/30'
                       : 'bg-white/80 border-slate-200 hover:border-cyan-300 shadow-sm'
                   }`}
                 >
                   <div className="text-[10px] uppercase font-mono text-slate-400">Active Tasks</div>
-                  <div className="text-sm font-bold text-cyan-400 flex items-center gap-1">
+                  <div className={`text-sm font-bold ${isJungle ? 'text-emerald-400' : 'text-cyan-400'} flex items-center gap-1`}>
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>{tasks.filter((t) => !t.completed).length} Tasks</span>
                   </div>
@@ -306,13 +319,15 @@ export function App() {
                 <button
                   onClick={() => setActiveTab('dashboard')}
                   className={`p-3 rounded-2xl border backdrop-blur-md text-left transition-all hover:scale-[1.02] ${
-                    theme === 'dark'
+                    isJungle
+                      ? 'bg-[#042418]/70 border-emerald-500/20 hover:border-emerald-500/40'
+                      : isDark
                       ? 'bg-slate-900/60 border-white/5 hover:border-emerald-500/30'
                       : 'bg-white/80 border-slate-200 hover:border-emerald-300 shadow-sm'
                   }`}
                 >
                   <div className="text-[10px] uppercase font-mono text-slate-400">Daily Target</div>
-                  <div className="text-sm font-bold text-purple-400 flex items-center gap-1">
+                  <div className={`text-sm font-bold ${isJungle ? 'text-amber-400' : 'text-purple-400'} flex items-center gap-1`}>
                     <Clock className="w-3.5 h-3.5" />
                     <span>{settings.dailyGoal} 🍅 Target</span>
                   </div>
@@ -366,13 +381,22 @@ export function App() {
       {/* Footer */}
       <footer className="relative z-10 py-4 text-center text-xs text-slate-500 font-mono flex items-center justify-center gap-4">
         <span className="flex items-center gap-1.5">
-          <Terminal className="w-3.5 h-3.5 text-purple-400" />
+          <Terminal className={`w-3.5 h-3.5 ${isJungle ? 'text-emerald-400' : 'text-purple-400'}`} />
           FocusFlow v2.4 • Open Source Productivity
         </span>
         <span>•</span>
         <span className="flex items-center gap-1 text-cyan-400/80">
-          <Sparkles className="w-3.5 h-3.5" />
-          GSoC Developer Edition
+          {isJungle ? (
+            <>
+              <Leaf className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-emerald-400">Jungle Oasis Edition</span>
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>GSAP Animated Edition</span>
+            </>
+          )}
         </span>
       </footer>
 

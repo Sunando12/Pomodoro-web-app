@@ -9,7 +9,7 @@ import {
   Clock, 
   Sparkles 
 } from 'lucide-react';
-import type { Task } from '../../types';
+import type { Task, ThemeMode } from '../../types';
 
 interface TaskManagerProps {
   tasks: Task[];
@@ -19,7 +19,7 @@ interface TaskManagerProps {
   onDeleteTask: (id: string) => void;
   onSetActiveTask: (id: string) => void;
   onUpdatePomodoros: (id: string, delta: number) => void;
-  theme: 'dark' | 'light';
+  theme: ThemeMode;
 }
 
 const TAG_STYLES: Record<string, { bg: string; text: string; border: string }> = {
@@ -41,7 +41,8 @@ export const TaskManager: React.FC<TaskManagerProps> = ({
   onUpdatePomodoros,
   theme,
 }) => {
-  const isDark = theme === 'dark';
+  const isDark = theme === 'dark' || theme === 'jungle';
+  const isJungle = theme === 'jungle';
   const [newTitle, setNewTitle] = useState('');
   const [newEstimated, setNewEstimated] = useState(2);
   const [newTag, setNewTag] = useState<Task['tag']>('Dev');
@@ -101,7 +102,11 @@ export const TaskManager: React.FC<TaskManagerProps> = ({
 
           <button
             onClick={() => setIsAdding(!isAdding)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white text-xs font-semibold shadow-md shadow-purple-500/20 transition-all hover:scale-105"
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-white text-xs font-semibold shadow-md transition-all hover:scale-105 ${
+              isJungle
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/25'
+                : 'bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 shadow-purple-500/20'
+            }`}
           >
             <Plus className="w-4 h-4" />
             <span>New Task</span>
@@ -118,7 +123,11 @@ export const TaskManager: React.FC<TaskManagerProps> = ({
             exit={{ opacity: 0, height: 0, y: -10 }}
             onSubmit={handleSubmit}
             className={`p-4 sm:p-5 rounded-2xl border mb-6 backdrop-blur-xl shadow-xl overflow-hidden ${
-              isDark ? 'bg-slate-900/80 border-purple-500/30' : 'bg-white border-purple-200 shadow-purple-100'
+              isJungle
+                ? 'bg-[#042418]/85 border-emerald-500/35 shadow-emerald-950/40'
+                : isDark
+                ? 'bg-slate-900/80 border-purple-500/30'
+                : 'bg-white border-purple-200 shadow-purple-100'
             }`}
           >
             <div className="flex items-center justify-between mb-3">

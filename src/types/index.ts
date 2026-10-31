@@ -12,7 +12,9 @@ export interface Task {
   createdAt: number;
 }
 
-export type AmbientSoundType = 'off' | 'rain' | 'whitenoise' | 'binaural' | 'cafe';
+export type ThemeMode = 'dark' | 'light' | 'jungle';
+
+export type AmbientSoundType = 'off' | 'rain' | 'whitenoise' | 'binaural' | 'cafe' | 'jungle';
 
 export interface TimerSettings {
   focusDuration: number;        // in minutes

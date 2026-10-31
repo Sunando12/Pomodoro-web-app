@@ -10,7 +10,7 @@ import {
   Check, 
   Target 
 } from 'lucide-react';
-import type { TimerSettings } from '../../types';
+import type { TimerSettings, ThemeMode } from '../../types';
 import { playCompletionSound } from '../../utils/audio';
 import { requestNotificationPermission, hasNotificationPermission } from '../../utils/notifications';
 
@@ -20,7 +20,7 @@ interface SettingsModalProps {
   settings: TimerSettings;
   onSaveSettings: (settings: TimerSettings) => void;
   onResetAllData: () => void;
-  theme: 'dark' | 'light';
+  theme: ThemeMode;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -31,7 +31,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onResetAllData,
   theme,
 }) => {
-  const isDark = theme === 'dark';
+  const isDark = theme === 'dark' || theme === 'jungle';
+  const isJungle = theme === 'jungle';
   const [formData, setFormData] = useState<TimerSettings>(settings);
   const [hasNotif, setHasNotif] = useState(hasNotificationPermission());
   const [showSavedFeedback, setShowSavedFeedback] = useState(false);
@@ -68,7 +69,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
           className={`relative w-full max-w-xl my-8 p-6 sm:p-8 rounded-3xl border shadow-2xl overflow-hidden ${
-            isDark ? 'bg-slate-900 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+            isJungle
+              ? 'bg-[#042015] border-emerald-500/20 text-white'
+              : isDark
+              ? 'bg-slate-900 border-white/10 text-white'
+              : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Header */}
